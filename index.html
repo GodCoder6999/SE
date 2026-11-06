@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SE Diagram Portfolio</title>
+<meta name="description" content="Software Engineering lab diagrams — DFD, Use Case, Class and Sequence diagrams for an Online Food Delivery System and a Library Management System, with full notation guides.">
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;📐&lt;/text&gt;&lt;/svg&gt;">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap bar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">SE</span>
+      <span class="brand-txt">
+        <strong>Diagram Portfolio</strong>
+        <small>Software Engineering Lab</small>
+      </span>
+    </div>
+    <nav class="mainnav">
+      <a href="#overview">Overview</a>
+      <a href="#food">Food Delivery</a><a href="#library">Library</a>
+      <a href="#notation">Notation</a>
+      <a href="#rules">Rules</a>
+    </nav>
+    <button id="theme" class="theme" type="button" aria-label="Toggle colour theme">
+      <span class="t-sun" aria-hidden="true">☀</span><span class="t-moon" aria-hidden="true">☾</span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero" id="overview">
+    <div class="wrap">
+      <p class="eyebrow">Structured &amp; object-oriented analysis</p>
+      <h1>Twelve diagrams, two systems,<br>one notation guide.</h1>
+      <p class="lede">
+        Every diagram below is drawn in standard notation and annotated with what it shows,
+        which symbols it uses and the rules it has to satisfy. The two systems are modelled
+        the same way, so you can compare them side by side: data flow first, then behaviour,
+        then structure.
+      </p>
+      <div class="stats">
+        <div><strong>12</strong><span>diagrams</span></div>
+        <div><strong>2</strong><span>systems</span></div>
+        <div><strong>4</strong><span>notations</span></div>
+        <div><strong>SVG</strong><span>fully editable</span></div>
+      </div>
+      <div class="hero-note">
+        <h4>How the four diagram types fit together</h4>
+        <p>
+          A <b>DFD</b> tracks data in motion — what information moves and what transforms it.
+          A <b>use case diagram</b> states what the system does for each actor. A
+          <b>class diagram</b> gives the nouns: the structure of the code. A
+          <b>sequence diagram</b> gives the verbs in order: one scenario playing out over time.
+          Together they describe the same system from four angles, and a good answer keeps
+          all four consistent with each other.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    
+    <section class="system" id="food">
+      <div class="sys-head">
+        <h2>Online Food Delivery System</h2>
+        <p>A customer browses restaurant menus, places an order, pays online, and a delivery agent carries the food to them. Modelled first as data flow (DFD), then as behaviour and structure (UML).</p>
+        <nav class="chips"><a class="chip" href="#fd-dfd0">DFD Level 0</a><a class="chip" href="#fd-dfd1">DFD Level 1</a><a class="chip" href="#fd-dfd2">DFD Level 2</a><a class="chip" href="#fd-uc">Use Case Diagram</a><a class="chip" href="#fd-class">Class Diagram</a><a class="chip" href="#fd-seq">Sequence Diagram</a></nav>
+      </div>
+      <div class="cards">
+      <article class="card" id="fd-dfd0">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>DFD Level 0 — Context Diagram</h3>
+            <p class="card-sub">Food Delivery</p>
+          </div>
+          <span class="tag tag-dfd">DFD</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/DFD_Level0_FoodDelivery.svg" alt="DFD Level 0 — Context Diagram" loading="lazy"
+               data-full="diagrams/DFD_Level0_FoodDelivery.svg" data-caption="DFD Level 0 — Context Diagram">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/DFD_Level0_FoodDelivery.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>The whole system drawn as a single process bubble, so you can see its scope: who talks to it and what data crosses the boundary. Nothing about the internals is shown yet.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Circle = process</li><li>Rectangle = external entity</li><li>Labelled arrow = data flow</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li>Exactly <b>one</b> process, numbered <code>0</code> — this is the rule for a context diagram.</li><li><b>No data stores</b> appear at Level 0, because stores live inside the system and the system is still a black box.</li><li>Four external entities: Customer, Restaurant, Delivery Agent and Payment Gateway.</li></ul>
+          </section>
+        </div>
+      </article>
+      <article class="card" id="fd-dfd1">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>DFD Level 1 — Main Processes</h3>
+            <p class="card-sub">Food Delivery</p>
+          </div>
+          <span class="tag tag-dfd">DFD</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/DFD_Level1_FoodDelivery.svg" alt="DFD Level 1 — Main Processes" loading="lazy"
+               data-full="diagrams/DFD_Level1_FoodDelivery.svg" data-caption="DFD Level 1 — Main Processes">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/DFD_Level1_FoodDelivery.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>The single Level-0 bubble opened up into the four main processes, with the data stores they read from and write to.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Circle = process</li><li>Open-ended rectangle = data store</li><li>Rectangle = external entity</li><li>Labelled arrow = data flow</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li>Processes <code>1.0</code> Register / Login, <code>2.0</code> Place Order &amp; Browse Menu, <code>3.0</code> Process Payment, <code>4.0</code> Assign &amp; Track Delivery.</li><li>Data stores <code>D1</code> User, <code>D2</code> Menu, <code>D3</code> Order, <code>D4</code> Payment.</li><li><b>Balanced against Level 0</b> — every flow that crossed the boundary in the context diagram reappears here, with nothing added or dropped.</li><li>Reading and writing the same store are drawn as <b>two separate arrows</b>, never one double-headed arrow.</li></ul>
+          </section>
+        </div>
+      </article>
+      <article class="card" id="fd-dfd2">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>DFD Level 2 — Explosion of Process 2.0</h3>
+            <p class="card-sub">Food Delivery</p>
+          </div>
+          <span class="tag tag-dfd">DFD</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/DFD_Level2_PlaceOrder.svg" alt="DFD Level 2 — Explosion of Process 2.0" loading="lazy"
+               data-full="diagrams/DFD_Level2_PlaceOrder.svg" data-caption="DFD Level 2 — Explosion of Process 2.0">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/DFD_Level2_PlaceOrder.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>Process 2.0 (Place Order &amp; Browse Menu) exploded one level further into its four sub-processes.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Circle = sub-process</li><li>Open-ended rectangle = data store</li><li>Dashed circle = process from the parent level</li><li>Corner slash = entity drawn twice</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li>Sub-processes inherit the parent's number: <code>2.1</code> Search Restaurants, <code>2.2</code> View Menu, <code>2.3</code> Manage Cart, <code>2.4</code> Confirm &amp; Submit Order.</li><li>The <b>dashed bubble</b> is process 3.0 from the parent level — shown only to indicate where a flow goes; it is not being decomposed here.</li><li>A <b>corner slash</b> marks an external entity drawn more than once, used to keep lines from crossing.</li></ul>
+          </section>
+        </div>
+      </article>
+      <article class="card" id="fd-uc">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>Use Case Diagram</h3>
+            <p class="card-sub">Food Delivery</p>
+          </div>
+          <span class="tag tag-use">Use Case</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/FoodDelivery_UseCase.svg" alt="Use Case Diagram" loading="lazy"
+               data-full="diagrams/FoodDelivery_UseCase.svg" data-caption="Use Case Diagram">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/FoodDelivery_UseCase.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>What each actor can do with the system — the functional requirements expressed as goals rather than as data movement.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Stick figure = actor</li><li>Oval = use case</li><li>Box = system boundary</li><li>Solid line = association</li><li>Dashed arrow = «include» / «extend»</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li><b>«include»</b> — Place Order includes Make Payment. Include means the step <i>always</i> runs as part of the base case.</li><li><b>«extend»</b> — Apply Coupon extends Place Order. Extend means <i>optional / conditional</i>, and the arrow points from the extending case <b>to</b> the base case.</li><li>Payment Gateway is marked <code>«external»</code> because it is a secondary actor: a system the software talks to, not one that initiates.</li></ul>
+          </section>
+        </div>
+      </article>
+      <article class="card" id="fd-class">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>Class Diagram</h3>
+            <p class="card-sub">Food Delivery</p>
+          </div>
+          <span class="tag tag-class">Class</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/FoodDelivery_ClassDiagram.svg" alt="Class Diagram" loading="lazy"
+               data-full="diagrams/FoodDelivery_ClassDiagram.svg" data-caption="Class Diagram">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/FoodDelivery_ClassDiagram.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>The static structure of the code — the classes, the data each holds (attributes), what each can do (methods), and how they relate.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Three-compartment box = class</li><li>Hollow triangle = generalization</li><li>Filled diamond = composition</li><li>Open arrow = association</li><li>1, *, 0..1, 1..* = multiplicity</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li><code>Customer</code> and <code>DeliveryAgent</code> both inherit from the abstract <code>User</code>, so <code>login()</code> / <code>logout()</code> are written once.</li><li><b>Composition</b> (filled diamond): <code>Order ◆— OrderItem</code> and <code>Restaurant ◆— MenuItem</code>. The part cannot exist without the whole — delete the Order and its OrderItems go with it.</li><li><code>Order 1 —— 1 Payment</code> is one-to-one; <code>Customer 1 —— * Order</code> is one-to-many.</li></ul>
+          </section>
+        </div>
+      </article>
+      <article class="card" id="fd-seq">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>Sequence Diagram — Place Order</h3>
+            <p class="card-sub">Food Delivery</p>
+          </div>
+          <span class="tag tag-sequence">Sequence</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/FoodDelivery_SequenceDiagram.svg" alt="Sequence Diagram — Place Order" loading="lazy"
+               data-full="diagrams/FoodDelivery_SequenceDiagram.svg" data-caption="Sequence Diagram — Place Order">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/FoodDelivery_SequenceDiagram.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>One scenario playing out over time: the exact order of messages exchanged when a customer places an order successfully.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Box at top = participant</li><li>Dashed vertical line = lifeline</li><li>Narrow rectangle = activation bar</li><li>Solid line + filled head = call</li><li>Dashed line + open head = return</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li>Read <b>top to bottom for time</b>, left to right for the objects talking.</li><li>A <code>:Name</code> prefix means <i>an object of that class</i>, which is the convention on a sequence diagram.</li><li>The activation bar on <code>:FoodDeliveryApp</code> runs almost the full height because it is the controller coordinating every step.</li><li>This is the <b>happy path</b> only. Failure branches (payment declined, restaurant rejects) would be drawn inside an <code>alt</code> combined fragment.</li></ul>
+          </section>
+        </div>
+      </article></div>
+    </section>
+    <section class="system" id="library">
+      <div class="sys-head">
+        <h2>Library Management System</h2>
+        <p>Members search a catalogue, borrow and return books, and pay fines when overdue; librarians maintain the catalogue and process transactions; suppliers deliver new books.</p>
+        <nav class="chips"><a class="chip" href="#lib-dfd0">DFD Level 0</a><a class="chip" href="#lib-dfd1">DFD Level 1</a><a class="chip" href="#lib-dfd2">DFD Level 2</a><a class="chip" href="#lib-uc">Use Case Diagram</a><a class="chip" href="#lib-class">Class Diagram</a><a class="chip" href="#lib-seq">Sequence Diagram</a></nav>
+      </div>
+      <div class="cards">
+      <article class="card" id="lib-dfd0">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>DFD Level 0 — Context Diagram</h3>
+            <p class="card-sub">Library</p>
+          </div>
+          <span class="tag tag-dfd">DFD</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/Library_DFD_Level0.svg" alt="DFD Level 0 — Context Diagram" loading="lazy"
+               data-full="diagrams/Library_DFD_Level0.svg" data-caption="DFD Level 0 — Context Diagram">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/Library_DFD_Level0.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>The library system as one bubble, showing only its scope and the three outside parties it exchanges data with.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Circle = process</li><li>Rectangle = external entity</li><li>Labelled arrow = data flow</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li>One process numbered <code>0</code>; no data stores, because the system is still a black box.</li><li>External entities: Member, Librarian and Supplier.</li></ul>
+          </section>
+        </div>
+      </article>
+      <article class="card" id="lib-dfd1">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>DFD Level 1 — Main Processes</h3>
+            <p class="card-sub">Library</p>
+          </div>
+          <span class="tag tag-dfd">DFD</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/Library_DFD_Level1.svg" alt="DFD Level 1 — Main Processes" loading="lazy"
+               data-full="diagrams/Library_DFD_Level1.svg" data-caption="DFD Level 1 — Main Processes">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/Library_DFD_Level1.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>The five main processes and the four data stores, laid out so that <b>no two lines cross</b> anywhere on the page.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Circle = process</li><li>Open-ended rectangle = data store</li><li>Double line on the left of a store = repeated store</li><li>Rectangle = external entity</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li>Processes <code>1.0</code> Manage Membership, <code>2.0</code> Search Catalog, <code>3.0</code> Issue Book, <code>4.0</code> Return Book &amp; Fine, <code>5.0</code> Maintain Catalog.</li><li>Stores <code>D1</code> Member, <code>D2</code> Book Catalog, <code>D3</code> Issue, <code>D4</code> Fine.</li><li>Every <b>external entity appears exactly once</b>. Member sits on the left and its lines <i>fan out</i> to the four processes it uses — lines radiating from one point can never cross each other.</li><li>Only <b>data stores</b> are repeated, marked with a double line on the left. Duplicating a heavily shared store is the standard way to keep a busy Level-1 diagram readable.</li></ul>
+          </section>
+        </div>
+      </article>
+      <article class="card" id="lib-dfd2">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>DFD Level 2 — Explosion of Process 3.0</h3>
+            <p class="card-sub">Library</p>
+          </div>
+          <span class="tag tag-dfd">DFD</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/Library_DFD_Level2_IssueBook.svg" alt="DFD Level 2 — Explosion of Process 3.0" loading="lazy"
+               data-full="diagrams/Library_DFD_Level2_IssueBook.svg" data-caption="DFD Level 2 — Explosion of Process 3.0">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/Library_DFD_Level2_IssueBook.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>Process 3.0 (Issue Book) exploded into the four steps that actually make up issuing a book.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Circle = sub-process</li><li>Open-ended rectangle = data store</li><li>Corner slash = entity drawn twice</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li><code>3.1</code> Verify Membership → <code>3.2</code> Check Availability → <code>3.3</code> Record Issue → <code>3.4</code> Generate Issue Slip.</li><li>Balanced against Level 1: the flows crossing into and out of bubble 3.0 reappear here exactly.</li></ul>
+          </section>
+        </div>
+      </article>
+      <article class="card" id="lib-uc">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>Use Case Diagram</h3>
+            <p class="card-sub">Library</p>
+          </div>
+          <span class="tag tag-use">Use Case</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/Library_UseCaseDiagram.svg" alt="Use Case Diagram" loading="lazy"
+               data-full="diagrams/Library_UseCaseDiagram.svg" data-caption="Use Case Diagram">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/Library_UseCaseDiagram.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>The goals each actor can pursue. Use cases that both a Member and a Librarian take part in sit in the middle column and are connected to both actors.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Stick figure = actor</li><li>Oval = use case</li><li>Box = system boundary</li><li>Solid line = association</li><li>Dashed arrow = «include» / «extend»</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li><b>«include»</b> — Issue Book includes Check Availability, because availability is checked on <i>every</i> issue.</li><li><b>«extend»</b> — Pay Fine extends Return Book, because a fine only arises <i>if</i> the book is overdue. The arrow points from the extending case to the base case.</li><li>Shared use cases are drawn <b>once</b> and connected to both actors, rather than duplicated — this is the correct UML treatment.</li></ul>
+          </section>
+        </div>
+      </article>
+      <article class="card" id="lib-class">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>Class Diagram</h3>
+            <p class="card-sub">Library</p>
+          </div>
+          <span class="tag tag-class">Class</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/Library_ClassDiagram.svg" alt="Class Diagram" loading="lazy"
+               data-full="diagrams/Library_ClassDiagram.svg" data-caption="Class Diagram">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/Library_ClassDiagram.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>The structure of the library software — eight classes with their attributes, methods and relationships.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Three-compartment box = class</li><li>Hollow triangle = generalization</li><li>Filled diamond = composition</li><li>Open arrow = association</li><li>1, *, 0..1, 1..* = multiplicity</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li><b>Book vs BookCopy</b> — a <code>Book</code> is the title/work; a <code>BookCopy</code> is a physical copy with its own <code>copyId</code> and <code>rackNo</code>. The library owns many copies of one book, so <code>Book ◆— 1..* BookCopy</code>.</li><li>Borrowing is captured by <code>IssueRecord</code>, which holds the issue, due and return dates.</li><li><code>IssueRecord → Fine</code> has multiplicity <code>0..1</code>: a loan returned on time has <b>no</b> fine, an overdue one has exactly one.</li></ul>
+          </section>
+        </div>
+      </article>
+      <article class="card" id="lib-seq">
+        <header class="card-head">
+          <div class="card-titles">
+            <h3>Sequence Diagram — Issue Book</h3>
+            <p class="card-sub">Library</p>
+          </div>
+          <span class="tag tag-sequence">Sequence</span>
+        </header>
+
+        <figure class="viewer">
+          <img src="diagrams/Library_SequenceDiagram.svg" alt="Sequence Diagram — Issue Book" loading="lazy"
+               data-full="diagrams/Library_SequenceDiagram.svg" data-caption="Sequence Diagram — Issue Book">
+          <figcaption>
+            <span class="hint">Click the diagram to enlarge</span>
+            <a class="dl" href="diagrams/Library_SequenceDiagram.svg" download>Download SVG</a>
+          </figcaption>
+        </figure>
+
+        <div class="card-body">
+          <section class="blk">
+            <h4>What it shows</h4>
+            <p>The thirteen messages exchanged when a member successfully borrows a book, in the order they happen.</p>
+          </section>
+          <section class="blk">
+            <h4>Symbols used</h4>
+            <ul class="syms"><li>Box at top = participant</li><li>Dashed vertical line = lifeline</li><li>Narrow rectangle = activation bar</li><li>Solid line + filled head = call</li><li>Dashed line + open head = return</li></ul>
+          </section>
+          <section class="blk wide">
+            <h4>Key points</h4>
+            <ul class="pts"><li>Flow: search → verify membership → check availability → create the issue record → update stock → issue slip back to the member.</li><li><code>:LibrarySystem</code> is the controller; <code>:MemberAccount</code>, <code>:Catalog</code> and <code>:IssueRecord</code> are the objects it delegates to.</li><li>Consistency check: <code>Issue Book</code> appears as a <b>use case</b>, as the <code>IssueRecord</code> <b>class</b>, and as this <b>sequence</b> — examiners look for that agreement across the three views.</li></ul>
+          </section>
+        </div>
+      </article></div>
+    </section>
+
+    <section class="notation" id="notation">
+      <div class="sec-head">
+        <h2>Notation reference</h2>
+        <p>Each diagram type has its own vocabulary. These are the symbols used across this
+           portfolio, with the naming conventions that go with them.</p>
+      </div>
+      <div class="notes">
+      <article class="note" id="n-dfd">
+        <h3>Data Flow Diagram (Yourdon–DeMarco)</h3>
+        <p class="note-intro">A DFD shows <b>data in motion</b> — what information moves where, and what transforms it. It is not a flowchart: there are no decisions, no loops and no timing in a DFD.</p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Element</th><th>Symbol</th><th>Meaning</th><th>How to name it</th></tr></thead>
+            <tbody><tr><th scope='row'>Process</th><td>Circle (bubble)</td><td>Something that <i>transforms</i> data</td><td>Verb + object — <i>Place Order</i></td></tr><tr><th scope='row'>External entity</th><td>Plain rectangle</td><td>A person or system <i>outside</i> the software</td><td>Noun — <i>Customer</i></td></tr><tr><th scope='row'>Data store</th><td>Open-ended rectangle</td><td>Where data <i>rests</i></td><td>Noun — <i>Order DB</i></td></tr><tr><th scope='row'>Data flow</th><td>Labelled arrow</td><td>Data <i>moving</i></td><td>Noun — the data itself</td></tr></tbody>
+          </table>
+        </div>
+      </article>
+      <article class="note" id="n-uc">
+        <h3>Use Case Diagram</h3>
+        <p class="note-intro">A use case diagram shows <b>what the system does for whom</b> — the functional requirements as goals, with no sequencing implied.</p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Element</th><th>Symbol</th><th>Meaning</th><th>How to name it</th></tr></thead>
+            <tbody><tr><th scope='row'>Actor</th><td>Stick figure</td><td>A role outside the system that uses it</td><td>Noun</td></tr><tr><th scope='row'>Use case</th><td>Oval</td><td>A goal the system helps an actor achieve</td><td>Verb phrase</td></tr><tr><th scope='row'>System boundary</th><td>Rectangle around the ovals</td><td>What is inside the software</td><td>System name</td></tr><tr><th scope='row'>Association</th><td>Plain solid line</td><td>This actor takes part in this use case</td><td>unlabelled</td></tr><tr><th scope='row'>«include»</th><td>Dashed arrow, base → included</td><td>The step <i>always</i> runs</td><td>stereotype label</td></tr><tr><th scope='row'>«extend»</th><td>Dashed arrow, extending → base</td><td>The step is <i>optional / conditional</i></td><td>stereotype label</td></tr></tbody>
+          </table>
+        </div>
+      </article>
+      <article class="note" id="n-class">
+        <h3>Class Diagram</h3>
+        <p class="note-intro">A class diagram shows the <b>static structure</b> of the code — the nouns of the system and how they are wired together.</p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Element</th><th>Symbol</th><th>Meaning</th><th>How to name it</th></tr></thead>
+            <tbody><tr><th scope='row'>Class</th><td>Box in three compartments</td><td>Name / attributes / methods</td><td><code>- private</code>, <code>+ public</code></td></tr><tr><th scope='row'>Generalization</th><td>Hollow triangle at the parent</td><td>“is-a” — inheritance</td><td>Child points to parent</td></tr><tr><th scope='row'>Composition</th><td>Filled diamond at the whole</td><td>Part <b>cannot</b> exist without the whole</td><td>Strong ownership</td></tr><tr><th scope='row'>Aggregation</th><td>Hollow diamond at the whole</td><td>Part <b>can</b> exist on its own</td><td>Weak ownership</td></tr><tr><th scope='row'>Association</th><td>Plain line / open arrow</td><td>“uses” or “linked to”</td><td>May carry a label</td></tr><tr><th scope='row'>Multiplicity</th><td><code>1</code> <code>*</code> <code>0..1</code> <code>1..*</code></td><td>How many objects at each end</td><td>Written at the line ends</td></tr></tbody>
+          </table>
+        </div>
+      </article>
+      <article class="note" id="n-seq">
+        <h3>Sequence Diagram</h3>
+        <p class="note-intro">A sequence diagram shows <b>behaviour over time</b> — the verbs of the system, in the order they happen, for one scenario.</p>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Element</th><th>Symbol</th><th>Meaning</th><th>How to name it</th></tr></thead>
+            <tbody><tr><th scope='row'>Participant</th><td>Box at the top</td><td>An actor or an object taking part</td><td><code>:ClassName</code> for an object</td></tr><tr><th scope='row'>Lifeline</th><td>Dashed vertical line</td><td>That participant's existence down the timeline</td><td>—</td></tr><tr><th scope='row'>Activation bar</th><td>Narrow rectangle on the lifeline</td><td>The object is busy doing something</td><td>—</td></tr><tr><th scope='row'>Synchronous call</th><td>Solid line + <b>filled</b> arrowhead</td><td>A request to do something</td><td><code>method(args)</code></td></tr><tr><th scope='row'>Return / reply</th><td>Dashed line + <b>open</b> arrowhead</td><td>The answer coming back</td><td>the value returned</td></tr><tr><th scope='row'>Combined fragment</th><td>Box labelled <code>alt</code> / <code>loop</code></td><td>Alternative or repeated flows</td><td>guard condition</td></tr></tbody>
+          </table>
+        </div>
+      </article></div>
+    </section>
+
+    <section class="rules" id="rules">
+      <div class="sec-head">
+        <h2>Rules that score marks</h2>
+        <p>The conventions examiners actually check. Most lost marks come from breaking one
+           of these rather than from drawing the wrong boxes.</p>
+      </div>
+      <ol class="rulelist"><li><h4>Every process needs at least one input and one output</h4><p>A process with an input but no output is a <b>black hole</b>; one with an output but no input is a <b>miracle</b>. Both lose marks.</p></li><li><h4>Never connect two passive things directly</h4><p>Entity → Entity, Store → Store, and Entity → Store are all illegal. Data must pass <b>through a process</b>: a customer cannot write to the database by themselves.</p></li><li><h4>Arrows are one-directional</h4><p>If a process both reads and writes a store, draw <b>two separate arrows</b>, not one double-headed arrow.</p></li><li><h4>Balancing — the big one</h4><p>Whatever data crosses the boundary of a process at one level must reappear <b>exactly</b> at the next level down. An unbalanced DFD is an instant deduction.</p></li><li><h4>Naming discipline</h4><p>Processes get <b>verb phrases</b>. Data flows, data stores and entities get <b>nouns</b>. Never label a flow with a verb.</p></li><li><h4>A context diagram has exactly one process and no data stores</h4><p>Level 0 shows scope only. Stores live inside the system, which is still a black box.</p></li><li><h4>Sub-processes inherit the parent&#x27;s number</h4><p>Exploding process <code>2.0</code> produces <code>2.1</code>, <code>2.2</code>, <code>2.3</code> — the numbering tells the examiner which level you are on.</p></li><li><h4>«include» = must happen, «extend» = may happen</h4><p>Both are dashed arrows, but <code>«extend»</code> points from the <i>extending</i> case <b>to</b> the base case — the direction students most often get backwards.</p></li><li><h4>Composition vs aggregation</h4><p>Filled diamond when the part dies with the whole; hollow diamond when the part survives on its own. Be ready to justify which you chose.</p></li><li><h4>Keep the three UML views consistent</h4><p>The same operation should be traceable as a <b>use case</b>, as a <b>class</b> with methods, and as a <b>sequence</b> of messages. Examiners check that they agree.</p></li></ol>
+    </section>
+  </div>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Software Engineering lab portfolio · diagrams authored as editable SVG and importable
+       into Wondershare EdrawMax, draw.io or any vector editor.</p>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lb-close" id="lbClose" type="button" aria-label="Close">×</button>
+  <figure class="lb-inner">
+    <img id="lbImg" src="" alt="">
+    <figcaption id="lbCap"></figcaption>
+  </figure>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
