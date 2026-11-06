@@ -1106,11 +1106,24 @@
   var KEY = 'se-builder-v2';
 
   /* fill the subject dropdown from the library */
-  (window.SUBJECTS ? window.SUBJECTS.list : []).forEach(function (sub) {
+  var LIB = (window.SUBJECTS && window.SUBJECTS.list) ? window.SUBJECTS.list : [];
+  LIB.forEach(function (sub) {
     var o = document.createElement('option');
     o.value = sub.id; o.textContent = sub.name;
     elSubj.appendChild(o);
   });
+  if (!LIB.length) {
+    /* subjects.js did not load - say so plainly instead of showing an empty list */
+    var miss = document.createElement('option');
+    miss.value = ''; miss.textContent = 'Subject library did not load';
+    elSubj.appendChild(miss);
+    elSubj.disabled = true;
+    elErr.hidden = false;
+    elErr.innerHTML = '<strong>assets/subjects.js did not load.</strong> ' +
+      'You may be viewing an older copy of this page \u2014 hard-refresh with ' +
+      'Ctrl+Shift+R (Cmd+Shift+R on a Mac), or re-download the latest files.';
+    return;
+  }
 
   function save() {
     try {
