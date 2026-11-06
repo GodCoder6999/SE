@@ -26,6 +26,7 @@
       <a href="#food">Food Delivery</a><a href="#library">Library</a>
       <a href="#notation">Notation</a>
       <a href="#rules">Rules</a>
+      <a href="builder.html" class="nav-cta">Builder</a>
     </nav>
     <button id="theme" class="theme" type="button" aria-label="Toggle colour theme">
       <span class="t-sun" aria-hidden="true">☀</span><span class="t-moon" aria-hidden="true">☾</span>
@@ -478,6 +479,36 @@
           </section>
         </div>
       </article></div>
+    </section>
+
+    <section class="maker" id="maker">
+      <div class="maker-card">
+        <div class="maker-txt">
+          <p class="eyebrow">Make your own</p>
+          <h2>Build these diagrams yourself</h2>
+          <p>
+            The builder turns a few lines of plain text into a finished diagram in this same
+            notation and style. Pick a type, describe the parts, drag anything that needs
+            moving, and download the SVG ready to import into EdrawMax. It covers all four
+            notations used in this portfolio.
+          </p>
+          <ul class="maker-list">
+            <li><b>Data Flow</b> — entities, numbered processes, data stores, labelled flows</li>
+            <li><b>Use Case</b> — actors, ovals, a system boundary, «include» and «extend»</li>
+            <li><b>Class</b> — attributes, methods, inheritance, composition, multiplicity</li>
+            <li><b>Sequence</b> — lifelines, activation bars, calls and returns</li>
+          </ul>
+          <a class="maker-go" href="builder.html">Open the builder →</a>
+        </div>
+        <pre class="maker-code"><code>title DFD Level 1 : Library
+
+entity Member
+process 3.0 Issue Book
+store D3 Issue DB
+
+flow Member -&gt; 3.0 : Borrow request
+flow 3.0 -&gt; D3 : Issue record</code></pre>
+      </div>
     </section>
 
     <section class="notation" id="notation">

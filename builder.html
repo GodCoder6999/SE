@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagram Builder</title>
+<meta name="description" content="Write a few lines of plain text and get a standards-compliant DFD, use case, class or sequence diagram as a downloadable SVG.">
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;📐&lt;/text&gt;&lt;/svg&gt;">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/builder.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap bar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">SE</span>
+      <span class="brand-txt">
+        <strong>Diagram Builder</strong>
+        <small>Software Engineering Lab</small>
+      </span>
+    </div>
+    <nav class="mainnav">
+      <a href="index.html">Portfolio</a>
+      <a href="index.html#notation">Notation</a>
+      <a href="index.html#rules">Rules</a>
+      <a href="builder.html" aria-current="page">Builder</a>
+    </nav>
+    <button id="theme" class="theme" type="button" aria-label="Toggle colour theme">
+      <span class="t-sun" aria-hidden="true">☀</span><span class="t-moon" aria-hidden="true">☾</span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="bhero">
+    <div class="wrap">
+      <p class="eyebrow">Make your own</p>
+      <h1>Describe it in text. Get a proper diagram.</h1>
+      <p class="lede">
+        Type a few lines on the left and the diagram draws itself on the right, in the same
+        notation and the same style as the portfolio. Drag any shape to move it, then download
+        the SVG and import it into EdrawMax. Your work is kept in this browser, so you can
+        close the tab and come back to it.
+      </p>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="toolbar">
+      <label class="field">
+        <span>Diagram type</span>
+        <select id="dType">
+          <option value="dfd">Data Flow Diagram</option>
+          <option value="usecase">Use Case Diagram</option>
+          <option value="class">Class Diagram</option>
+          <option value="sequence">Sequence Diagram</option>
+        </select>
+      </label>
+      <div class="tbtns">
+        <button id="dTpl"      class="btn"        type="button">Load example</button>
+        <button id="dClear"    class="btn"        type="button">Start blank</button>
+        <button id="dReset"    class="btn"        type="button">Reset layout</button>
+        <button id="dCopy"     class="btn"        type="button">Copy SVG</button>
+        <button id="dDownload" class="btn btn-go" type="button">Download SVG</button>
+      </div>
+    </div>
+
+    <div class="studio">
+      <section class="pane pane-edit">
+        <h2 class="pane-h">Your description</h2>
+        <textarea id="dSrc" spellcheck="false" aria-label="Diagram description"></textarea>
+        <p id="dErr" class="err" hidden></p>
+
+        <h3 class="cheat-h">Syntax for this diagram type</h3>
+        <table class="cheat"><tbody id="dCheat"></tbody></table>
+
+        <div class="tips">
+          <h4>Tips</h4>
+          <ul>
+            <li>Refer to a process by its number (<code>2.0</code>) or by its full name — both work.</li>
+            <li>Order matters only on sequence diagrams: messages are drawn top to bottom in the order you write them.</li>
+            <li>Lines starting with <code>#</code> are ignored, so you can leave yourself notes.</li>
+            <li>If the default placement is messy, <b>drag the shapes</b> — your layout is remembered.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="pane pane-view">
+        <h2 class="pane-h">Live preview <span class="muted">— drag any shape to reposition</span></h2>
+        <div id="dOut" class="canvas"></div>
+      </section>
+    </div>
+
+    <section class="after">
+      <h2>Once you've downloaded it</h2>
+      <div class="after-grid">
+        <article>
+          <h3>Import into EdrawMax</h3>
+          <p><code>File → Import → SVG</code>, or drag the file onto the canvas. Every shape,
+             arrow and label stays a separate editable object.</p>
+        </article>
+        <article>
+          <h3>Arrowheads are safe</h3>
+          <p>Arrowheads are drawn as real geometry, not SVG markers, because EdrawMax drops
+             markers on import and the arrows would otherwise disappear.</p>
+        </article>
+        <article>
+          <h3>Check it against the rules</h3>
+          <p>Before submitting, run your diagram past the
+             <a href="index.html#rules">rules checklist</a> — balancing, naming discipline and
+             the no-direct-store-to-store rule are where marks are usually lost.</p>
+        </article>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Software Engineering lab portfolio · diagrams authored as editable SVG and importable
+       into Wondershare EdrawMax, draw.io or any vector editor.</p>
+  </div>
+</footer>
+
+<script src="assets/app.js"></script>
+<script src="assets/builder.js"></script>
+</body>
+</html>
