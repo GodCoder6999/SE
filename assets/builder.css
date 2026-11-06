@@ -43,8 +43,6 @@
 .btn-go:hover { background: var(--brand-700); border-color: var(--brand-700); color: #fff; }
 
 /* ---------- studio layout ---------------------------------------------- */
-.studio { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 20px; }
-
 .pane {
   background: var(--surface); border: 1px solid var(--rule);
   border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; min-width: 0;
@@ -114,8 +112,34 @@ table.cheat code { font-size: 11.8px; white-space: normal; overflow-wrap: anywhe
 
 /* ---------- responsive --------------------------------------------------- */
 @media (max-width: 940px) {
-  .studio { grid-template-columns: 1fr; }
+  .adv-body { grid-template-columns: 1fr; }
   .tbtns { margin-left: 0; width: 100%; }
   .field select { min-width: 0; width: 100%; }
   .field { width: 100%; }
 }
+
+/* ---------- advanced (collapsible) editor ------------------------------ */
+.adv {
+  margin-top: 18px; background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+}
+.adv > summary {
+  cursor: pointer; padding: 15px 18px; list-style: none;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.adv > summary::-webkit-details-marker { display: none; }
+.adv > summary::before {
+  content: '▸'; position: absolute; margin-left: -14px; color: var(--ink-3);
+}
+.adv[open] > summary::before { content: '▾'; }
+.adv > summary:hover .adv-t { color: var(--brand-700); }
+.adv-t { font-size: 14.5px; font-weight: 650; color: var(--ink); }
+.adv-s { font-size: 13px; color: var(--ink-3); }
+.adv-body {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px;
+  padding: 4px 18px 20px; border-top: 1px solid var(--rule-2);
+}
+.adv-edit, .adv-ref { min-width: 0; padding-top: 14px; }
+.adv-hint { font-size: 12.5px; color: var(--ink-3); margin: 9px 0 0; }
+.pane-view { margin-top: 0; }
+.pane-h #dCaption { color: var(--brand); }

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Diagram Builder</title>
-<meta name="description" content="Write a few lines of plain text and get a standards-compliant DFD, use case, class or sequence diagram as a downloadable SVG.">
+<meta name="description" content="Pick a diagram type and a subject and get a finished DFD, use case, class, sequence, activity, state chart, ER, component or deployment diagram as a downloadable SVG.">
 <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;📐&lt;/text&gt;&lt;/svg&gt;">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/builder.css">
@@ -38,12 +38,12 @@
   <section class="bhero">
     <div class="wrap">
       <p class="eyebrow">Make your own</p>
-      <h1>Describe it in text. Get a proper diagram.</h1>
+      <h1>Pick a diagram. Pick a subject. Done.</h1>
       <p class="lede">
-        Type a few lines on the left and the diagram draws itself on the right, in the same
-        notation and the same style as the portfolio. Drag any shape to move it, then download
-        the SVG and import it into EdrawMax. Your work is kept in this browser, so you can
-        close the tab and come back to it.
+        Ten diagram types across ten standard lab systems — a hundred ready-made diagrams,
+        drawn in proper notation in the same style as the portfolio. Choose the two dropdowns
+        and the diagram appears. Drag anything that needs moving, then download the SVG and
+        import it into EdrawMax.
       </p>
     </div>
   </section>
@@ -51,48 +51,98 @@
   <div class="wrap">
     <div class="toolbar">
       <label class="field">
-        <span>Diagram type</span>
+        <span>1 · Diagram type</span>
         <select id="dType">
-          <option value="dfd">Data Flow Diagram</option>
+          <option value="dfd0">DFD — Level 0 (Context)</option>
+          <option value="dfd">DFD — Level 1</option>
           <option value="usecase">Use Case Diagram</option>
           <option value="class">Class Diagram</option>
           <option value="sequence">Sequence Diagram</option>
+          <option value="activity">Activity Diagram</option>
+          <option value="state">State Chart Diagram</option>
+          <option value="er">ER Diagram</option>
+          <option value="component">Component Diagram</option>
+          <option value="deployment">Deployment Diagram</option>
         </select>
       </label>
+      <label class="field">
+        <span>2 · Subject</span>
+        <select id="dSubject"></select>
+      </label>
       <div class="tbtns">
-        <button id="dTpl"      class="btn"        type="button">Load example</button>
-        <button id="dClear"    class="btn"        type="button">Start blank</button>
+        <button id="dRegen"    class="btn"        type="button">Regenerate</button>
         <button id="dReset"    class="btn"        type="button">Reset layout</button>
         <button id="dCopy"     class="btn"        type="button">Copy SVG</button>
         <button id="dDownload" class="btn btn-go" type="button">Download SVG</button>
       </div>
     </div>
 
-    <div class="studio">
-      <section class="pane pane-edit">
-        <h2 class="pane-h">Your description</h2>
-        <textarea id="dSrc" spellcheck="false" aria-label="Diagram description"></textarea>
-        <p id="dErr" class="err" hidden></p>
+    <section class="pane pane-view">
+      <h2 class="pane-h">
+        <span id="dCaption">Preview</span>
+        <span class="muted">— drag any shape to reposition it</span>
+      </h2>
+      <div id="dOut" class="canvas"></div>
+      <p id="dErr" class="err" hidden></p>
+    </section>
 
-        <h3 class="cheat-h">Syntax for this diagram type</h3>
-        <table class="cheat"><tbody id="dCheat"></tbody></table>
-
-        <div class="tips">
-          <h4>Tips</h4>
-          <ul>
-            <li>Refer to a process by its number (<code>2.0</code>) or by its full name — both work.</li>
-            <li>Order matters only on sequence diagrams: messages are drawn top to bottom in the order you write them.</li>
-            <li>Lines starting with <code>#</code> are ignored, so you can leave yourself notes.</li>
-            <li>If the default placement is messy, <b>drag the shapes</b> — your layout is remembered.</li>
-          </ul>
+    <details class="adv">
+      <summary>
+        <span class="adv-t">Advanced — edit the diagram as text</span>
+        <span class="adv-s">Change any label, add a process, remove a class. The preview updates as you type.</span>
+      </summary>
+      <div class="adv-body">
+        <div class="adv-edit">
+          <textarea id="dSrc" spellcheck="false" aria-label="Diagram description"></textarea>
+          <p class="adv-hint">
+            <b>Regenerate</b> throws your edits away and rebuilds the diagram from the subject.
+            Lines starting with <code>#</code> are ignored.
+          </p>
         </div>
-      </section>
+        <div class="adv-ref">
+          <h3 class="cheat-h">Syntax for this diagram type</h3>
+          <table class="cheat"><tbody id="dCheat"></tbody></table>
+        </div>
+      </div>
+    </details>
 
-      <section class="pane pane-view">
-        <h2 class="pane-h">Live preview <span class="muted">— drag any shape to reposition</span></h2>
-        <div id="dOut" class="canvas"></div>
-      </section>
-    </div>
+    <section class="after">
+      <h2>What each type is for</h2>
+      <div class="after-grid">
+        <article>
+          <h3>Data flow — Level 0 &amp; 1</h3>
+          <p>Tracks <b>data in motion</b>. Level 0 is the whole system as one bubble and fixes
+             the scope; Level 1 opens it into the main processes and the stores they use.</p>
+        </article>
+        <article>
+          <h3>Use case</h3>
+          <p>States <b>what the system does for each actor</b>, as goals. Carries
+             <code>«include»</code> for steps that always happen and <code>«extend»</code> for
+             optional ones.</p>
+        </article>
+        <article>
+          <h3>Class &amp; ER</h3>
+          <p>The <b>structure</b>. A class diagram gives attributes, methods, inheritance and
+             composition; an ER diagram gives the same data as entities, attribute ellipses and
+             relationship diamonds.</p>
+        </article>
+        <article>
+          <h3>Sequence &amp; activity</h3>
+          <p>The <b>behaviour</b>. A sequence diagram shows messages between objects in order;
+             an activity diagram shows the workflow with its decisions and loops.</p>
+        </article>
+        <article>
+          <h3>State chart</h3>
+          <p>The <b>lifecycle of one object</b> — every state it can be in and the event that
+             moves it to the next one.</p>
+        </article>
+        <article>
+          <h3>Component &amp; deployment</h3>
+          <p>The <b>implementation view</b>. Components show the software modules and what they
+             depend on; deployment shows which hardware node each piece runs on.</p>
+        </article>
+      </div>
+    </section>
 
     <section class="after">
       <h2>Once you've downloaded it</h2>
@@ -126,6 +176,7 @@
 </footer>
 
 <script src="assets/app.js"></script>
+<script src="assets/subjects.js"></script>
 <script src="assets/builder.js"></script>
 </body>
 </html>

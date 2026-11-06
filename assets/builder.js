@@ -130,6 +130,7 @@
   }
 
   function parse(type, src) {
+    if (type === 'dfd0') type = 'dfd';
     var model = { type: type, title: '', nodes: [], edges: [], system: '', errors: [] };
     var ls = lines(src), i, L, kw, rest, m, parts;
 
@@ -248,6 +249,90 @@
         }
       }
 
+
+      /* ---------------- ACTIVITY ---------------- */
+      if (type === 'activity') {
+        if (kw === 'start' || kw === 'end') {
+          node(kw + '#' + model.nodes.length, 'act-' + kw, kw); continue;
+        }
+        if (kw === 'action' || kw === 'decision' || kw === 'else') {
+          node(kw + '#' + model.nodes.length, 'act-' + kw, rest); continue;
+        }
+      }
+
+      /* ---------------- STATE CHART ---------------- */
+      if (type === 'state') {
+        if (kw === 'state') { node(rest, 'state', rest); continue; }
+        if (kw === 'initial') { model.initial = rest; continue; }
+        if (kw === 'final') { model.final = rest; continue; }
+        if (kw === 'trans') {
+          parts = edgeParts(rest);
+          if (parts) model.edges.push({ from: parts.from, to: parts.to, label: parts.label, kind: 'trans' });
+          else model.errors.push('Line ' + (i + 1) + ': trans needs  A -> B : event');
+          continue;
+        }
+      }
+
+      /* ---------------- ER ---------------- */
+      if (type === 'er') {
+        if (kw === 'erentity') { node(rest, 'erentity', rest, { attrs: [] }); continue; }
+        if (kw === 'erkey' || kw === 'erattr') {
+          var ix = rest.indexOf(':');
+          if (ix > 0) {
+            var en = rest.slice(0, ix).trim(), an = rest.slice(ix + 1).trim();
+            var tgt = find(en);
+            if (tgt) tgt.attrs.push({ n: an, key: kw === 'erkey' });
+            else model.errors.push('Line ' + (i + 1) + ': unknown entity "' + en + '"');
+          }
+          continue;
+        }
+        if (kw === 'errel') {
+          var mm = rest.match(/\[([^,\]]*),\s*([^\]]*)\]\s*$/);
+          var bb = mm ? rest.slice(0, mm.index) : rest;
+          parts = edgeParts(bb);
+          if (parts) {
+            model.edges.push({
+              from: parts.from, to: parts.to, label: parts.label || 'relates', kind: 'errel',
+              m1: mm ? mm[1].trim() : '1', m2: mm ? mm[2].trim() : 'N'
+            });
+          } else model.errors.push('Line ' + (i + 1) + ': errel needs  A - B : name [1,N]');
+          continue;
+        }
+      }
+
+      /* ---------------- COMPONENT ---------------- */
+      if (type === 'component') {
+        if (kw === 'component') { node(rest, 'component', rest); continue; }
+        if (kw === 'database') { node(rest, 'database', rest); continue; }
+        if (kw === 'depend') {
+          parts = edgeParts(rest);
+          if (parts) model.edges.push({ from: parts.from, to: parts.to, label: parts.label, kind: 'depend' });
+          else model.errors.push('Line ' + (i + 1) + ': depend needs  A -> B : label');
+          continue;
+        }
+      }
+
+      /* ---------------- DEPLOYMENT ---------------- */
+      if (type === 'deployment') {
+        if (kw === 'node') { node(rest, 'dnode', rest, { arts: [] }); continue; }
+        if (kw === 'artifact') {
+          var jx = rest.indexOf(':');
+          if (jx > 0) {
+            var nn = rest.slice(0, jx).trim(), aa = rest.slice(jx + 1).trim();
+            var tg = find(nn);
+            if (tg) tg.arts.push(aa);
+            else model.errors.push('Line ' + (i + 1) + ': unknown node "' + nn + '"');
+          }
+          continue;
+        }
+        if (kw === 'conn') {
+          parts = edgeParts(rest);
+          if (parts) model.edges.push({ from: parts.from, to: parts.to, label: parts.label, kind: 'conn' });
+          else model.errors.push('Line ' + (i + 1) + ': conn needs  A -> B : protocol');
+          continue;
+        }
+      }
+
       model.errors.push('Line ' + (i + 1) + ': don’t recognise "' + m[1] + '"');
     }
 
@@ -256,6 +341,8 @@
       var a = find(e.from), b = find(e.to);
       if (!a && type === 'sequence') a = node(e.from, 'participant', e.from);
       if (!b && type === 'sequence') b = node(e.to, 'participant', e.to);
+      if (!a && type === 'component') a = node(e.from, 'component', e.from);
+      if (!b && type === 'component') b = node(e.to, 'component', e.to);
       if (!a) model.errors.push('Unknown: "' + e.from + '"');
       if (!b) model.errors.push('Unknown: "' + e.to + '"');
       e.a = a; e.b = b;
@@ -280,9 +367,19 @@
       var ents = model.nodes.filter(function (n) { return n.kind === 'entity'; });
       var procs = model.nodes.filter(function (n) { return n.kind === 'process'; });
       var sts = model.nodes.filter(function (n) { return n.kind === 'store'; });
-      ents.forEach(function (n, k) { place(n, 130, 150 + k * 150); });
-      procs.forEach(function (n, k) { place(n, 520, 150 + k * 165); });
-      sts.forEach(function (n, k) { place(n, 920, 150 + k * 130); });
+      if (procs.length === 1 && sts.length === 0) {
+        /* context diagram: the single bubble in the middle, entities either side */
+        var rows = Math.ceil(ents.length / 2), gap = 200, top = 150;
+        ents.forEach(function (n, k) {
+          var side = k % 2 === 0 ? 180 : 1080;
+          place(n, side, top + Math.floor(k / 2) * gap);
+        });
+        place(procs[0], 630, top + ((rows - 1) * gap) / 2);
+      } else {
+        ents.forEach(function (n, k) { place(n, 130, 150 + k * 150); });
+        procs.forEach(function (n, k) { place(n, 520, 150 + k * 165); });
+        sts.forEach(function (n, k) { place(n, 920, 150 + k * 130); });
+      }
     } else if (t === 'usecase') {
       var acts = model.nodes.filter(function (n) { return n.kind === 'actor'; });
       var ucs = model.nodes.filter(function (n) { return n.kind === 'usecase'; });
@@ -302,6 +399,46 @@
         var c = colY.indexOf(Math.min.apply(null, colY));
         place(n, colX[c], colY[c] + h / 2);
         colY[c] += h + 90;
+      });
+    } else if (t === 'activity') {
+      var steps = model.nodes.filter(function (n) { return n.kind.indexOf('act-') === 0; });
+      var ay = 96, prevMain = null;
+      steps.forEach(function (n) {
+        if (n.kind === 'act-else') { n._owner = prevMain; return; }
+        var hh = n.kind === 'act-decision' ? 92 : (n.kind === 'act-action' ? 54 : 38);
+        place(n, 430, ay + hh / 2);
+        ay += hh + 48;
+        prevMain = n;
+      });
+      steps.forEach(function (n) {
+        if (n.kind !== 'act-else') return;
+        place(n, 790, n._owner ? n._owner.y : 160);
+      });
+    } else if (t === 'state') {
+      var sts = model.nodes.filter(function (n) { return n.kind === 'state'; });
+      sts.forEach(function (n, k) { place(n, 420, 150 + k * 122); });
+    } else if (t === 'er') {
+      var es = model.nodes.filter(function (n) { return n.kind === 'erentity'; });
+      var ex = 240;
+      es.forEach(function (n) {
+        var span = Math.max(200, (n.attrs.length - 1) * 150 + 140);
+        place(n, ex + span / 2, 470);
+        ex += span + 80;
+      });
+    } else if (t === 'component') {
+      var cps = model.nodes.filter(function (n) { return n.kind === 'component'; });
+      var dbs = model.nodes.filter(function (n) { return n.kind === 'database'; });
+      cps.forEach(function (n, k) {
+        place(n, 240 + (k % 3) * 340, 150 + Math.floor(k / 3) * 180);
+      });
+      var base = 150 + Math.ceil(cps.length / 3) * 180 + 30;
+      dbs.forEach(function (n, k) { place(n, 330 + k * 380, base); });
+    } else if (t === 'deployment') {
+      var nds = model.nodes.filter(function (n) { return n.kind === 'dnode'; });
+      nds.forEach(function (n, k) {
+        var hh = 76 + n.arts.length * 36;
+        place(n, 360, 150 + k * 250);
+        n._h = hh;
       });
     } else if (t === 'sequence') {
       var ps = model.nodes.filter(function (n) {
@@ -348,7 +485,7 @@
     return gWrap(n, s);
   }
   function drawProcess(n) {
-    var r = 58, s = '';
+    var r = (n.num === '0') ? 92 : 58, s = '';
     s += '<circle cx="' + n.x + '" cy="' + n.y + '" r="' + r + '" fill="' + P.brandL +
       '" stroke="' + P.brand + '" stroke-width="2.2"/>';
     var ls = wrap(n.label, 13), top = n.y + 4 - (ls.length - 1) * 8 - (n.num ? 9 : 0);
@@ -450,6 +587,11 @@
     var t = model.type, body = '', b;
 
     if (t === 'sequence') return renderSequence(model);
+    if (t === 'activity') return renderActivity(model);
+    if (t === 'state') return renderState(model);
+    if (t === 'er') return renderER(model);
+    if (t === 'component') return renderComponent(model);
+    if (t === 'deployment') return renderDeployment(model);
 
     /* measure pass: draw nodes once so w/h/r are known, then draw edges under them */
     var nodeSvg = model.nodes.map(function (n) {
@@ -506,6 +648,311 @@
 
     b = bounds(model, 40);
     return frame(Math.max(b.w, 760), Math.max(b.h, 420), model.title, boundary + body + nodeSvg);
+  }
+
+
+  /* ---- curved connector, used by the state chart ---------------------- */
+  function curvePath(x1, y1, x2, y2, bulge) {
+    var mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+    var dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
+    var cx = mx + (-dy / len) * bulge, cy = my + (dx / len) * bulge;
+    return { d: 'M' + x1 + ',' + y1 + ' Q' + cx + ',' + cy + ' ' + x2 + ',' + y2,
+             cx: cx, cy: cy,
+             lx: 0.25 * x1 + 0.5 * cx + 0.25 * x2,
+             ly: 0.25 * y1 + 0.5 * cy + 0.25 * y2 };
+  }
+
+  /* ====================== ACTIVITY ====================== */
+  function renderActivity(model) {
+    var steps = model.nodes.filter(function (n) { return n.kind.indexOf('act-') === 0; });
+    var main = steps.filter(function (n) { return n.kind !== 'act-else'; });
+    var body = '', shapes = '';
+
+    steps.forEach(function (n) {
+      var s = '';
+      if (n.kind === 'act-start') {
+        n.w = 32; n.h = 32;
+        s = '<circle cx="' + n.x + '" cy="' + n.y + '" r="15" fill="' + P.line + '"/>';
+      } else if (n.kind === 'act-end') {
+        n.w = 38; n.h = 38;
+        s = '<circle cx="' + n.x + '" cy="' + n.y + '" r="17" fill="#FFFFFF" stroke="' + P.line + '" stroke-width="2"/>' +
+            '<circle cx="' + n.x + '" cy="' + n.y + '" r="10" fill="' + P.line + '"/>';
+      } else if (n.kind === 'act-decision') {
+        var dw = Math.max(170, n.label.length * 7.4 + 44), dh = 92;
+        n.w = dw; n.h = dh;
+        s = '<polygon points="' + n.x + ',' + (n.y - dh / 2) + ' ' + (n.x + dw / 2) + ',' + n.y +
+            ' ' + n.x + ',' + (n.y + dh / 2) + ' ' + (n.x - dw / 2) + ',' + n.y +
+            '" fill="#FFF8E1" stroke="' + P.amber + '" stroke-width="2"/>';
+        wrap(n.label, 22).forEach(function (t, k, arr) {
+          s += text(n.x, n.y + 5 - (arr.length - 1) * 8 + k * 16, t,
+            { size: 12.5, fill: P.amberD, anchor: 'middle', weight: 'bold' });
+        });
+      } else {
+        var isElse = n.kind === 'act-else';
+        var w = Math.max(190, n.label.length * 7.2 + 36), h = 54;
+        n.w = w; n.h = h;
+        s = '<rect x="' + (n.x - w / 2) + '" y="' + (n.y - h / 2) + '" width="' + w +
+            '" height="' + h + '" rx="26" fill="' + (isElse ? '#FFF1F1' : P.brandL) +
+            '" stroke="' + (isElse ? '#C62828' : P.brand) + '" stroke-width="2"/>';
+        s += text(n.x, n.y + 5, n.label,
+          { size: 13, fill: isElse ? '#B71C1C' : P.brandD, anchor: 'middle', weight: 'bold' });
+      }
+      shapes += gWrap(n, s);
+    });
+
+    /* sequential flow down the main column */
+    main.forEach(function (n, k) {
+      if (k === main.length - 1) return;
+      var nx = main[k + 1];
+      var y1 = n.y + (n.h || 40) / 2, y2 = nx.y - (nx.h || 40) / 2;
+      body += lineSeg(n.x, y1, nx.x, y2);
+      body += headSolid(n.x, y1, nx.x, y2);
+      if (n.kind === 'act-decision') {
+        body += text(n.x + 8, (y1 + y2) / 2 + 4, '[ Yes ]', { size: 11, fill: P.muted });
+      }
+    });
+
+    /* each else branch: No out of the decision, then a retry loop back */
+    steps.forEach(function (n) {
+      if (n.kind !== 'act-else' || !n._owner) return;
+      var d = n._owner;
+      var x1 = d.x + (d.w || 160) / 2, x2 = n.x - (n.w || 180) / 2;
+      body += lineSeg(x1, d.y, x2, n.y);
+      body += headSolid(x1, d.y, x2, n.y);
+      body += text((x1 + x2) / 2 - 16, Math.min(d.y, n.y) - 8, '[ No ]', { size: 11, fill: P.muted });
+
+      var idx = main.indexOf(d);
+      var back = idx > 0 ? main[idx - 1] : null;
+      if (back) {
+        var ty = back.y, tx = back.x + (back.w || 160) / 2;
+        body += '<path d="M' + n.x + ',' + (n.y - (n.h || 54) / 2) + ' L' + n.x + ',' + ty +
+          ' L' + (tx + 14) + ',' + ty + '" fill="none" stroke="' + P.line + '" stroke-width="1.4"/>';
+        body += headSolid(tx + 40, ty, tx + 2, ty);
+      }
+    });
+
+    var b = bounds(model, 50);
+    return frame(Math.max(b.w, 760), Math.max(b.h, 420), model.title, body + shapes);
+  }
+
+  /* ====================== STATE CHART ====================== */
+  function renderState(model) {
+    var sts = model.nodes.filter(function (n) { return n.kind === 'state'; });
+    var body = '', shapes = '';
+
+    sts.forEach(function (n) {
+      var w = Math.max(190, n.label.length * 8 + 40), h = 54;
+      n.w = w; n.h = h;
+      var s = '<rect x="' + (n.x - w / 2) + '" y="' + (n.y - h / 2) + '" width="' + w +
+        '" height="' + h + '" rx="16" fill="' + P.brandL + '" stroke="' + P.brand +
+        '" stroke-width="2"/>';
+      s += text(n.x, n.y + 5, n.label, { size: 13, fill: P.brandD, anchor: 'middle', weight: 'bold' });
+      shapes += gWrap(n, s);
+    });
+
+    function byName(nm) {
+      var r = null;
+      sts.forEach(function (n) { if (n.label === nm) r = n; });
+      return r;
+    }
+
+    /* initial pseudo-state */
+    var init = byName(model.initial);
+    if (init) {
+      var ix = init.x - (init.w / 2) - 80, iy = init.y;
+      body += '<circle cx="' + ix + '" cy="' + iy + '" r="13" fill="' + P.line + '"/>';
+      body += lineSeg(ix + 13, iy, init.x - init.w / 2 - 2, iy);
+      body += headSolid(ix + 13, iy, init.x - init.w / 2 - 2, iy);
+    }
+    /* final state marker */
+    var fin = byName(model.final);
+    if (fin) {
+      var fx = fin.x + (fin.w / 2) + 80, fy = fin.y;
+      body += lineSeg(fin.x + fin.w / 2 + 2, fy, fx - 18, fy);
+      body += headSolid(fin.x + fin.w / 2 + 2, fy, fx - 18, fy);
+      body += '<circle cx="' + fx + '" cy="' + fy + '" r="16" fill="#FFFFFF" stroke="' + P.line + '" stroke-width="2"/>';
+      body += '<circle cx="' + fx + '" cy="' + fy + '" r="9" fill="' + P.line + '"/>';
+    }
+
+    var detourR = 0, detourL = 0, maxOff = 0;
+    model.edges.forEach(function (e) {
+      if (!e.a || !e.b) return;
+      var i1 = sts.indexOf(e.a), i2 = sts.indexOf(e.b);
+      var forward = i2 > i1, span = Math.abs(i2 - i1);
+      var p1, p2, bulge, right;
+      if (span <= 1) {
+        /* neighbours: a short curve between the facing edges */
+        p1 = [e.a.x + (forward ? 22 : -22), e.a.y + (forward ? e.a.h / 2 : -e.a.h / 2)];
+        p2 = [e.b.x + (forward ? 22 : -22), e.b.y + (forward ? -e.b.h / 2 : e.b.h / 2)];
+        bulge = forward ? 30 : -30;
+        right = forward;
+      } else {
+        /* longer hops detour around the side so they clear the state boxes */
+        right = forward;
+        var k = right ? detourR++ : detourL++;
+        var off = (e.a.w / 2) + 80 + k * 86;
+        if (off > maxOff) maxOff = off;
+        p1 = [e.a.x + (right ? e.a.w / 2 : -e.a.w / 2), e.a.y];
+        p2 = [e.b.x + (right ? e.b.w / 2 : -e.b.w / 2), e.b.y];
+        bulge = right ? -off * 2 : off * 2;
+      }
+      var c = curvePath(p1[0], p1[1], p2[0], p2[1], bulge);
+      body += '<path d="' + c.d + '" fill="none" stroke="' + P.line + '" stroke-width="1.4"/>';
+      body += headSolid(c.cx, c.cy, p2[0], p2[1]);
+      if (e.label) {
+        body += text(c.lx + (right ? 8 : -8), c.ly - 5, e.label,
+          { size: 11, fill: '#37474F', anchor: right ? 'start' : 'end' });
+      }
+    });
+
+    var b = bounds(model, 120 + maxOff + 130);
+    return frame(Math.max(b.w, 820), Math.max(b.h, 420), model.title, body + shapes);
+  }
+
+  /* ====================== ER (Chen notation) ====================== */
+  function renderER(model) {
+    var es = model.nodes.filter(function (n) { return n.kind === 'erentity'; });
+    var body = '', shapes = '';
+
+    es.forEach(function (n) {
+      var w = Math.max(170, n.label.length * 9 + 36), h = 56;
+      n.w = w; n.h = h;
+      var s = '<rect x="' + (n.x - w / 2) + '" y="' + (n.y - h / 2) + '" width="' + w +
+        '" height="' + h + '" fill="' + P.blueF + '" stroke="' + P.blueS + '" stroke-width="2"/>';
+      s += text(n.x, n.y + 5, n.label, { size: 14, fill: P.blueD, anchor: 'middle', weight: 'bold' });
+      shapes += gWrap(n, s);
+
+      /* attribute ellipses fanned above the entity */
+      var k = n.attrs.length;
+      n.attrs.forEach(function (a, j) {
+        var ax = n.x + (j - (k - 1) / 2) * 150;
+        var ay = n.y - (j % 2 === 0 ? 150 : 216);
+        var rx = Math.max(56, a.n.length * 4.2 + 18);
+        body += lineSeg(n.x + (ax - n.x) * 0.22, n.y - h / 2, ax, ay + 24);
+        body += '<ellipse cx="' + ax + '" cy="' + ay + '" rx="' + rx + '" ry="24" fill="#FFFFFF" stroke="' +
+          P.blueS + '" stroke-width="1.6"/>';
+        body += text(ax, ay + 4, a.n, { size: 11.5, fill: P.blueD, anchor: 'middle' });
+        if (a.key) {
+          body += '<line x1="' + (ax - a.n.length * 3.2) + '" y1="' + (ay + 7) + '" x2="' +
+            (ax + a.n.length * 3.2) + '" y2="' + (ay + 7) + '" stroke="' + P.blueD + '" stroke-width="1.2"/>';
+        }
+      });
+    });
+
+    model.edges.forEach(function (e) {
+      if (!e.a || !e.b) return;
+      var i1 = es.indexOf(e.a), i2 = es.indexOf(e.b);
+      var adjacent = Math.abs(i1 - i2) === 1;
+      var dx = (e.a.x + e.b.x) / 2;
+      var dy = adjacent ? e.a.y : e.a.y + 210;
+      var dw = Math.max(150, (e.label.length * 6.6) + 40), dh = 72;
+
+      var p1 = anchorOf(e.a, dx, dy), p2 = anchorOf(e.b, dx, dy);
+      body += lineSeg(p1[0], p1[1], dx - dw / 2 + 6, dy);
+      body += lineSeg(dx + dw / 2 - 6, dy, p2[0], p2[1]);
+      body += text(dx - dw / 2 - 14, dy - 9, e.m1, { size: 12.5, fill: P.brandD, anchor: 'end', weight: 'bold' });
+      body += text(dx + dw / 2 + 14, dy - 9, e.m2, { size: 12.5, fill: P.brandD, anchor: 'start', weight: 'bold' });
+      body += '<polygon points="' + dx + ',' + (dy - dh / 2) + ' ' + (dx + dw / 2) + ',' + dy +
+        ' ' + dx + ',' + (dy + dh / 2) + ' ' + (dx - dw / 2) + ',' + dy +
+        '" fill="#FFF8E1" stroke="' + P.amber + '" stroke-width="2"/>';
+      body += text(dx, dy + 4, e.label, { size: 12, fill: P.amberD, anchor: 'middle', weight: 'bold' });
+    });
+
+    var b = bounds(model, 150);
+    return frame(Math.max(b.w, 860), Math.max(b.h + 150, 620), model.title, body + shapes);
+  }
+
+  /* ====================== COMPONENT ====================== */
+  function renderComponent(model) {
+    var body = '', shapes = '';
+
+    model.nodes.forEach(function (n) {
+      var s = '';
+      if (n.kind === 'database') {
+        var dw = Math.max(170, n.label.length * 8 + 34), dh = 86;
+        n.w = dw; n.h = dh;
+        var x = n.x - dw / 2, y = n.y - dh / 2;
+        s += '<path d="M' + x + ',' + (y + 16) + ' L' + x + ',' + (y + dh - 16) +
+          ' A' + (dw / 2) + ',16 0 0 0 ' + (x + dw) + ',' + (y + dh - 16) +
+          ' L' + (x + dw) + ',' + (y + 16) + ' Z" fill="#FFF8E1" stroke="' + P.amber + '" stroke-width="2"/>';
+        s += '<ellipse cx="' + n.x + '" cy="' + (y + 16) + '" rx="' + (dw / 2) + '" ry="16" fill="#FFFDF5" stroke="' +
+          P.amber + '" stroke-width="2"/>';
+        s += text(n.x, n.y + 16, n.label, { size: 12.5, fill: P.amberD, anchor: 'middle', weight: 'bold' });
+      } else {
+        var w = Math.max(215, n.label.length * 7.6 + 50), h = 76;
+        n.w = w; n.h = h;
+        var bx = n.x - w / 2, by = n.y - h / 2;
+        s += '<rect x="' + bx + '" y="' + by + '" width="' + w + '" height="' + h +
+          '" fill="' + P.brandL + '" stroke="' + P.brand + '" stroke-width="2"/>';
+        s += '<rect x="' + (bx - 9) + '" y="' + (by + 14) + '" width="18" height="13" fill="#FFFFFF" stroke="' + P.brand + '" stroke-width="1.6"/>';
+        s += '<rect x="' + (bx - 9) + '" y="' + (by + 44) + '" width="18" height="13" fill="#FFFFFF" stroke="' + P.brand + '" stroke-width="1.6"/>';
+        s += text(n.x + w / 2 - 10, by + 17, '«component»',
+          { size: 9.5, fill: P.brandM, anchor: 'end', italic: true });
+        wrap(n.label, 22).forEach(function (t, k, arr) {
+          s += text(n.x, n.y + 12 - (arr.length - 1) * 8 + k * 16, t,
+            { size: 13, fill: P.brandD, anchor: 'middle', weight: 'bold' });
+        });
+      }
+      shapes += gWrap(n, s);
+    });
+
+    model.edges.forEach(function (e) {
+      if (!e.a || !e.b) return;
+      var p1 = anchorOf(e.a, e.b.x, e.b.y), p2 = anchorOf(e.b, e.a.x, e.a.y);
+      body += lineSeg(p1[0], p1[1], p2[0], p2[1], true);
+      body += headOpen(p1[0], p1[1], p2[0], p2[1]);
+      if (e.label) {
+        body += text((p1[0] + p2[0]) / 2 + 6, (p1[1] + p2[1]) / 2 - 5,
+          '«' + e.label + '»', { size: 10.5, fill: P.muted, italic: true });
+      }
+    });
+
+    var b = bounds(model, 50);
+    return frame(Math.max(b.w, 860), Math.max(b.h, 420), model.title, body + shapes);
+  }
+
+  /* ====================== DEPLOYMENT ====================== */
+  function renderDeployment(model) {
+    var body = '', shapes = '';
+    var D = 16;
+
+    model.nodes.forEach(function (n) {
+      var w = 300, h = 70 + n.arts.length * 36;
+      n.w = w; n.h = h;
+      var x = n.x - w / 2, y = n.y - h / 2;
+      var s = '';
+      /* 3-D box: front face plus top and right faces */
+      s += '<polygon points="' + x + ',' + y + ' ' + (x + D) + ',' + (y - D) + ' ' +
+        (x + w + D) + ',' + (y - D) + ' ' + (x + w) + ',' + y +
+        '" fill="#D8CEF2" stroke="' + P.brand + '" stroke-width="1.8"/>';
+      s += '<polygon points="' + (x + w) + ',' + y + ' ' + (x + w + D) + ',' + (y - D) + ' ' +
+        (x + w + D) + ',' + (y + h - D) + ' ' + (x + w) + ',' + (y + h) +
+        '" fill="#C9BCEC" stroke="' + P.brand + '" stroke-width="1.8"/>';
+      s += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h +
+        '" fill="' + P.brandL + '" stroke="' + P.brand + '" stroke-width="2"/>';
+      s += text(n.x, y + 20, '«device»', { size: 9.5, fill: P.brandM, anchor: 'middle', italic: true });
+      s += text(n.x, y + 40, n.label, { size: 13.5, fill: P.brandD, anchor: 'middle', weight: 'bold' });
+      n.arts.forEach(function (a, k) {
+        var ay = y + 54 + k * 36;
+        s += '<rect x="' + (x + 18) + '" y="' + ay + '" width="' + (w - 36) + '" height="28" fill="#FFFFFF" stroke="' +
+          P.brand + '" stroke-width="1.4"/>';
+        s += text(x + 28, ay + 18, '«artifact»  ' + a, { size: 11, fill: P.ink });
+      });
+      shapes += gWrap(n, s);
+    });
+
+    model.edges.forEach(function (e) {
+      if (!e.a || !e.b) return;
+      var p1 = anchorOf(e.a, e.b.x, e.b.y), p2 = anchorOf(e.b, e.a.x, e.a.y);
+      body += lineSeg(p1[0], p1[1], p2[0], p2[1], false);
+      if (e.label) {
+        body += text((p1[0] + p2[0]) / 2 + 10, (p1[1] + p2[1]) / 2 + 4, e.label,
+          { size: 11.5, fill: '#37474F' });
+      }
+    });
+
+    var b = bounds(model, 60);
+    return frame(Math.max(b.w + 30, 760), Math.max(b.h, 420), model.title, body + shapes);
   }
 
   function renderSequence(model) {
@@ -569,121 +1016,20 @@
   }
 
   /* ======================================================================
-     TEMPLATES
+     SYNTAX CHEAT SHEETS (for the optional advanced editor)
      ====================================================================== */
-  var TPL = {
-    dfd: {
-      label: 'DFD — Library, Level 1',
-      text: [
-        'title DFD Level 1 : Library Management System',
-        '',
-        'entity Member',
-        'entity Librarian',
-        '',
-        'process 1.0 Manage Membership',
-        'process 2.0 Search Catalog',
-        'process 3.0 Issue Book',
-        '',
-        'store D1 Member DB',
-        'store D2 Book Catalog DB',
-        'store D3 Issue DB',
-        '',
-        'flow Member -> 1.0 : Registration details',
-        'flow 1.0 -> D1 : Member record',
-        'flow Member -> 2.0 : Search query',
-        'flow D2 -> 2.0 : Book info',
-        'flow Member -> 3.0 : Borrow request',
-        'flow D1 -> 3.0 : Member status',
-        'flow 3.0 -> D3 : Issue record',
-        'flow Librarian -> 3.0 : Approve issue'
-      ].join('\n')
-    },
-    usecase: {
-      label: 'Use Case — Food Delivery',
-      text: [
-        'title Use Case Diagram : Online Food Delivery System',
-        'system Online Food Delivery System',
-        '',
-        'actor Customer',
-        'actor Restaurant',
-        '',
-        'usecase Register / Login',
-        'usecase Browse Menu',
-        'usecase Place Order',
-        'usecase Make Payment',
-        'usecase Apply Coupon',
-        'usecase Accept Order',
-        '',
-        'link Customer - Register / Login',
-        'link Customer - Browse Menu',
-        'link Customer - Place Order',
-        'link Restaurant - Accept Order',
-        '',
-        'include Place Order -> Make Payment',
-        'extend Apply Coupon -> Place Order'
-      ].join('\n')
-    },
-    'class': {
-      label: 'Class — Orders',
-      text: [
-        'title Class Diagram : Online Food Delivery System',
-        '',
-        'abstract class User {',
-        '- userId : int',
-        '- name : String',
-        '+ login()',
-        '+ logout()',
-        '}',
-        '',
-        'class Customer {',
-        '- deliveryAddress : String',
-        '+ placeOrder()',
-        '+ trackOrder()',
-        '}',
-        '',
-        'class Order {',
-        '- orderId : int',
-        '- totalAmount : double',
-        '+ calculateTotal()',
-        '}',
-        '',
-        'class OrderItem {',
-        '- quantity : int',
-        '+ calculateSubtotal()',
-        '}',
-        '',
-        'inherit Customer -> User',
-        'assoc Customer -> Order : places [1,*]',
-        'compose Order -> OrderItem : contains [1,1..*]'
-      ].join('\n')
-    },
-    sequence: {
-      label: 'Sequence — Issue Book',
-      text: [
-        'title Sequence Diagram : Issue Book',
-        '',
-        'actor Member',
-        'participant :LibrarySystem',
-        'participant :Catalog',
-        'participant :IssueRecord',
-        '',
-        'call Member -> :LibrarySystem : requestIssue(bookId)',
-        'call :LibrarySystem -> :Catalog : checkAvailability(bookId)',
-        'return :Catalog -> :LibrarySystem : copy available',
-        'call :LibrarySystem -> :IssueRecord : createIssue(memberId, copyId)',
-        'return :IssueRecord -> :LibrarySystem : issueId + dueDate',
-        'return :LibrarySystem -> Member : issue slip + due date'
-      ].join('\n')
-    }
-  };
-
   var CHEAT = {
+    dfd0: [
+      ['entity Customer', 'an external entity (rectangle)'],
+      ['process 0 Food Delivery System', 'the single context process'],
+      ['flow Customer -> 0 : Order details', 'a data flow into the system'],
+      ['flow 0 -> Customer : Confirmation', 'a data flow back out']
+    ],
     dfd: [
       ['entity Customer', 'an external entity (rectangle)'],
       ['process 2.0 Place Order', 'a process (circle), numbered'],
       ['store D1 Order DB', 'a data store (open rectangle)'],
-      ['flow Customer -> 2.0 : Order request', 'a data flow (labelled arrow)'],
-      ['title DFD Level 1 : ...', 'the purple heading bar']
+      ['flow Customer -> 2.0 : Order request', 'a data flow (labelled arrow)']
     ],
     usecase: [
       ['system Library Management System', 'label on the boundary box'],
@@ -700,15 +1046,43 @@
       ['abstract class User {', 'an abstract class'],
       ['inherit Customer -> User', 'generalization (hollow triangle)'],
       ['compose Order -> OrderItem [1,1..*]', 'composition (filled diamond)'],
-      ['aggregate Team -> Player [1,*]', 'aggregation (hollow diamond)'],
+      ['aggregate Invoice -> Service [1,*]', 'aggregation (hollow diamond)'],
       ['assoc Customer -> Order : places [1,*]', 'association + multiplicity']
     ],
     sequence: [
       ['actor Member', 'an actor lifeline (blue header)'],
       ['participant :LibrarySystem', 'an object lifeline'],
       ['call A -> B : method()', 'solid line, filled arrowhead'],
-      ['return B -> A : result', 'dashed line, open arrowhead'],
-      ['', 'messages appear in the order you write them']
+      ['return B -> A : result', 'dashed line, open arrowhead']
+    ],
+    activity: [
+      ['start', 'the initial node (filled circle)'],
+      ['action Login to the system', 'an activity (rounded rectangle)'],
+      ['decision Valid member?', 'a decision (diamond)'],
+      ['else Show error message', 'the No branch, loops back to retry'],
+      ['end', 'the final node (bullseye)']
+    ],
+    state: [
+      ['state Issued', 'a state (rounded rectangle)'],
+      ['initial Available', 'where the lifecycle starts'],
+      ['final Lost', 'where the lifecycle ends'],
+      ['trans Available -> Issued : issueBook()', 'a transition + its trigger']
+    ],
+    er: [
+      ['erentity Member', 'an entity (rectangle)'],
+      ['erkey Member : memberId', 'the primary key (underlined)'],
+      ['erattr Member : name', 'an ordinary attribute (ellipse)'],
+      ['errel Member - Book : borrows [1,N]', 'a relationship (diamond) + cardinality']
+    ],
+    component: [
+      ['component Order Service', 'a component box'],
+      ['database Order DB', 'a database (cylinder)'],
+      ['depend A -> B : uses', 'a dependency (dashed arrow)']
+    ],
+    deployment: [
+      ['node Application Server', 'a hardware node (3-D box)'],
+      ['artifact Application Server : Web App', 'something deployed on that node'],
+      ['conn Client Device -> Application Server : HTTPS', 'a communication path']
     ]
   };
 
@@ -716,40 +1090,47 @@
      UI WIRING
      ====================================================================== */
   var elType = document.getElementById('dType');
+  var elSubj = document.getElementById('dSubject');
   var elSrc = document.getElementById('dSrc');
   var elOut = document.getElementById('dOut');
   var elErr = document.getElementById('dErr');
   var elCheat = document.getElementById('dCheat');
-  var elTplBtn = document.getElementById('dTpl');
+  var elRegen = document.getElementById('dRegen');
   var elReset = document.getElementById('dReset');
   var elDl = document.getElementById('dDownload');
   var elCopy = document.getElementById('dCopy');
-  var elClear = document.getElementById('dClear');
-  if (!elType || !elSrc || !elOut) return;
+  var elCaption = document.getElementById('dCaption');
+  if (!elType || !elSubj || !elOut) return;
 
-  var state = { positions: {}, svg: '', model: null };
-  var KEY = 'se-builder';
+  var state = { positions: {}, svg: '', model: null, custom: false };
+  var KEY = 'se-builder-v2';
+
+  /* fill the subject dropdown from the library */
+  (window.SUBJECTS ? window.SUBJECTS.list : []).forEach(function (sub) {
+    var o = document.createElement('option');
+    o.value = sub.id; o.textContent = sub.name;
+    elSubj.appendChild(o);
+  });
 
   function save() {
     try {
       localStorage.setItem(KEY, JSON.stringify({
-        type: elType.value, src: elSrc.value, pos: state.positions
+        type: elType.value, subject: elSubj.value, src: elSrc.value,
+        pos: state.positions, custom: state.custom
       }));
     } catch (e) { /* storage unavailable — the page still works */ }
   }
   function restore() {
     try {
-      var raw = localStorage.getItem(KEY);
-      if (!raw) return false;
-      var d = JSON.parse(raw);
-      if (d && d.src) {
-        elType.value = d.type || 'dfd';
-        elSrc.value = d.src;
-        state.positions = d.pos || {};
-        return true;
-      }
-    } catch (e) { /* ignore corrupt or blocked storage */ }
-    return false;
+      var d = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (!d || !d.src) return false;
+      if (d.type) elType.value = d.type;
+      if (d.subject) elSubj.value = d.subject;
+      elSrc.value = d.src;
+      state.positions = d.pos || {};
+      state.custom = !!d.custom;
+      return true;
+    } catch (e) { return false; }
   }
 
   function showCheat() {
@@ -757,6 +1138,20 @@
     elCheat.innerHTML = rows.map(function (r) {
       return '<tr><td><code>' + esc(r[0]) + '</code></td><td>' + esc(r[1]) + '</td></tr>';
     }).join('');
+  }
+
+  function caption() {
+    var t = elType.options[elType.selectedIndex].textContent;
+    var sj = elSubj.options[elSubj.selectedIndex].textContent;
+    elCaption.textContent = t + ' · ' + sj + (state.custom ? ' · edited' : '');
+  }
+
+  function generate() {
+    if (!window.SUBJECTS) return;
+    elSrc.value = window.SUBJECTS.spec(elType.value, elSubj.value);
+    state.positions = {};
+    state.custom = false;
+    build();
   }
 
   function build() {
@@ -770,6 +1165,7 @@
         ':</strong> ' + esc(model.errors.slice(0, 4).join(' · '))
       : '';
     elErr.hidden = !model.errors.length;
+    caption();
     bindDrag();
     save();
   }
@@ -788,15 +1184,14 @@
         if (!node) return;
         var box = svg.getBoundingClientRect();
         var vb = svg.viewBox.baseVal;
-        var scale = vb.width / box.width;
-        var startX = ev.clientX, startY = ev.clientY;
-        var ox = node.x, oy = node.y;
+        var scale = vb.width / (box.width || 1);
+        var startX = ev.clientX, startY = ev.clientY, ox = node.x, oy = node.y;
         g.style.cursor = 'grabbing';
-
         function move(e2) {
-          var nx = ox + (e2.clientX - startX) * scale;
-          var ny = oy + (e2.clientY - startY) * scale;
-          state.positions[id] = { x: Math.round(nx), y: Math.round(ny) };
+          state.positions[id] = {
+            x: Math.round(ox + (e2.clientX - startX) * scale),
+            y: Math.round(oy + (e2.clientY - startY) * scale)
+          };
           build();
         }
         function up() {
@@ -811,25 +1206,17 @@
   }
 
   /* ---- actions -------------------------------------------------------- */
-  function slug(s) {
-    return (s || 'diagram').toLowerCase().replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '').slice(0, 60) || 'diagram';
+  function slug(s2) {
+    return (s2 || 'diagram').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '').slice(0, 70) || 'diagram';
   }
 
-  elType.addEventListener('change', function () {
-    elSrc.value = TPL[elType.value].text;
-    state.positions = {};
-    showCheat(); build();
-  });
-  elSrc.addEventListener('input', build);
-  elTplBtn.addEventListener('click', function () {
-    elSrc.value = TPL[elType.value].text;
-    state.positions = {}; build();
-  });
+  elType.addEventListener('change', function () { showCheat(); generate(); });
+  elSubj.addEventListener('change', generate);
+  elRegen.addEventListener('click', generate);
   elReset.addEventListener('click', function () { state.positions = {}; build(); });
-  elClear.addEventListener('click', function () {
-    elSrc.value = 'title My Diagram\n'; state.positions = {}; build(); elSrc.focus();
-  });
+  elSrc.addEventListener('input', function () { state.custom = true; build(); });
+
   elDl.addEventListener('click', function () {
     var blob = new Blob([state.svg], { type: 'image/svg+xml' });
     var a = document.createElement('a');
@@ -838,6 +1225,7 @@
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
   });
+
   elCopy.addEventListener('click', function () {
     var done = function () {
       elCopy.textContent = 'Copied';
@@ -853,7 +1241,6 @@
     }
   });
 
-  if (!restore()) elSrc.value = TPL.dfd.text;
   showCheat();
-  build();
+  if (restore()) build(); else generate();
 })();

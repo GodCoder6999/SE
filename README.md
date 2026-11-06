@@ -24,33 +24,48 @@ Source: Deploy from a branch → Branch: `main` / root**. The site then appears 
 
 ## Diagram Builder
 
-`builder.html` is a small tool for drawing new diagrams in the same notation and style.
-Describe the diagram in a few lines of plain text and it renders live; drag any shape to
-reposition it, then download the result as SVG.
+`builder.html` generates finished diagrams for you. Pick a **diagram type** and a
+**subject** from the two dropdowns and the diagram is drawn — no description to write.
+Drag any shape to reposition it, then download the SVG.
 
-```
-title DFD Level 1 : Library
+**10 diagram types** × **10 lab systems** = 100 ready-made diagrams:
 
-entity Member
-process 3.0 Issue Book
-store D3 Issue DB
+| Diagram types | Subjects |
+|---|---|
+| DFD — Level 0 (Context) | Library Management System |
+| DFD — Level 1 | Online Food Delivery System |
+| Use Case Diagram | ATM System |
+| Class Diagram | Hospital Management System |
+| Sequence Diagram | Railway Reservation System |
+| Activity Diagram | Online Shopping System |
+| State Chart Diagram | Student Result Management System |
+| ER Diagram (Chen notation) | Hotel Booking System |
+| Component Diagram | Online Banking System |
+| Deployment Diagram | Payroll Management System |
 
-flow Member -> 3.0 : Borrow request
-flow 3.0 -> D3 : Issue record
-```
+Everything the generator produces is also editable: open **Advanced — edit the diagram as
+text** and change any label, add a process, or remove a class, and the preview updates as
+you type. **Regenerate** throws the edits away and rebuilds from the subject.
 
-It supports all four notations used here:
+<details>
+<summary>Text syntax, if you want to write a diagram from scratch</summary>
 
 | Type | Keywords |
 |---|---|
-| Data Flow | `entity` · `process` · `store` · `flow A -> B : label` |
-| Use Case | `actor` · `usecase` · `link` · `include` · `extend` · `system` |
+| Data Flow | `entity` · `process 2.0 Name` · `store D1 Name` · `flow A -> B : label` |
+| Use Case | `actor` · `usecase` · `link A - B` · `include` · `extend` · `system` |
 | Class | `class X { }` · `abstract class` · `inherit` · `compose` · `aggregate` · `assoc` |
 | Sequence | `actor` · `participant` · `call A -> B : msg` · `return B -> A : msg` |
+| Activity | `start` · `action` · `decision` · `else` · `end` |
+| State Chart | `state` · `initial` · `final` · `trans A -> B : event` |
+| ER | `erentity` · `erkey E : attr` · `erattr E : attr` · `errel A - B : name [1,N]` |
+| Component | `component` · `database` · `depend A -> B : label` |
+| Deployment | `node` · `artifact Node : name` · `conn A -> B : protocol` |
 
 Multiplicity goes in square brackets — `assoc Customer -> Order : places [1,*]`. Lines
-beginning with `#` are ignored. Your work and your layout are kept in the browser's local
-storage, so closing the tab does not lose them.
+beginning with `#` are ignored. Your selection, edits and layout are kept in the browser's
+local storage, so closing the tab does not lose them.
+</details>
 
 ---
 
@@ -64,7 +79,8 @@ storage, so closing the tab does not lose them.
 │   ├── style.css       # theme, layout, light + dark mode
 │   ├── app.js          # theme toggle, diagram lightbox, scroll-spy
 │   ├── builder.css     # builder page styles
-│   └── builder.js      # parser, layout, SVG renderer, drag + export
+│   ├── builder.js      # parser, layout, SVG renderers, drag + export
+│   └── subjects.js     # the 10 subject models every diagram is generated from
 └── diagrams/           # the twelve diagrams, as editable SVG
     ├── DFD_Level0_FoodDelivery.svg
     ├── DFD_Level1_FoodDelivery.svg
